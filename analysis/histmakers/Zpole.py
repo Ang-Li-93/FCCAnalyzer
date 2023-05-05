@@ -42,30 +42,7 @@ def build_graph_ll(df, dataset):
     df = df.Alias("MCRecoAssociations1", "MCRecoAssociations#1.index")
     df = df.Alias("Lepton0", "Muon#0.index")
     
-    df = df.Define("RP_px", "FCCAnalyses::ReconstructedParticle::get_px(ReconstructedParticles)")
-    df = df.Define("RP_py", "FCCAnalyses::ReconstructedParticle::get_py(ReconstructedParticles)")
-    df = df.Define("RP_pz", "FCCAnalyses::ReconstructedParticle::get_pz(ReconstructedParticles)")
-    df = df.Define("RP_e",  "FCCAnalyses::ReconstructedParticle::get_e(ReconstructedParticles)")
-    df = df.Define("RP_m",  "FCCAnalyses::ReconstructedParticle::get_mass(ReconstructedParticles)")
-    df = df.Define("RP_q",  "FCCAnalyses::ReconstructedParticle::get_charge(ReconstructedParticles)")
     
-    df = df.Define('EVT_thrust',     'FCCAnalyses::Algorithms::minimize_thrust("Minuit2","Migrad")(RP_px, RP_py, RP_pz)')
-    df = df.Define('EVT_thrust_x',   "EVT_thrust.at(1)")
-    df = df.Define('EVT_thrust_y',   "EVT_thrust.at(3)")
-    df = df.Define('EVT_thrust_z',   "EVT_thrust.at(5)")
-    df = df.Define('EVT_thrust_r',   "sqrt(EVT_thrust_x*EVT_thrust_x+EVT_thrust_y*EVT_thrust_y+EVT_thrust_z*EVT_thrust_z)")
-    df = df.Define('EVT_thrust_val', "EVT_thrust.at(0)")
-    df = df.Define('EVT_cos_thrustangle', 'EVT_thrust_z/EVT_thrust_r')
-    df = df.Define('EVT_cos_thrustangle_abs', 'abs(EVT_cos_thrustangle)')
-    
-    results.append(df.Histo1D(("EVT_thrust_val", "", *bins_thrustval), "EVT_thrust_val"))
-    results.append(df.Histo1D(("EVT_cos_thrustangle", "", *bins_cos), "EVT_cos_thrustangle"))
-    results.append(df.Histo1D(("EVT_cos_thrustangle_abs", "", *bins_cos), "EVT_cos_thrustangle_abs"))
-    results.append(df.Histo1D(("EVT_thrust_x", "", *bins_thrustcomp), "EVT_thrust_x"))
-    results.append(df.Histo1D(("EVT_thrust_y", "", *bins_thrustcomp), "EVT_thrust_y"))
-    results.append(df.Histo1D(("EVT_thrust_z", "", *bins_thrustcomp), "EVT_thrust_z"))
-    results.append(df.Histo1D(("EVT_thrust_r", "", *bins_thrustcomp), "EVT_thrust_r"))
-
     # gen muons
     df = df.Define("gen_muons", "FCCAnalyses::get_gen_pdg(Particle, 13)") # muon pdg index=13
     df = df.Define("gen_muons_p", "FCCAnalyses::MCParticle::get_p(gen_muons)")
@@ -144,13 +121,11 @@ def build_graph_ll(df, dataset):
 
 if __name__ == "__main__":
 
-    baseDir = functions.get_basedir() # get base directory of samples, depends on the cluster hostname (mit, cern, ...)
-    baseDir = "/eos/experiment/fcc/ee/generation/DelphesEvents/"
-    import FCCee_spring2021_ecm91_IDEA
-    datasets_spring2021_ecm91 = FCCee_spring2021_ecm91_IDEA.get_datasets(baseDir=baseDir) # list of all datasets
-    datasets = [] # list of datasets to be run over
+    baseDir = functions.get_basedir()
 
-    datasets += functions.filter_datasets(datasets_spring2021_ecm91, ["p8_ee_Zmumu_ecm91"])
-    result = functions.build_and_run(datasets, build_graph_ll, "tmp/output_xsec_example.root", maxFiles=args.maxFiles)
+    wzp6_mumu = {"name": "wzp6_mumu", "datadir": f"{baseDir}/winter2023/IDEA/wzp6_ee_mumu_ecm92p0",  "xsec": 1}
+
+    datasets = [wzp6_mumu]
+    result = functions.build_and_run(datasets, build_graph_ll, "tmp/output_Zpole.root", maxFiles=args.maxFiles)
 
     
