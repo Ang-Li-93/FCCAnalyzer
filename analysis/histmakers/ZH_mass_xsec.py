@@ -41,12 +41,12 @@ import ROOT
 
 if args.flavor == "mumu":
     ROOT.gInterpreter.ProcessLine('''
-          TMVA::Experimental::RBDT<> bdt("ZH_Recoil_BDT", "/eos/user/l/lia/FCCee/Winter2023/mumu/BDT/xgb_bdt.root");
+          TMVA::Experimental::RBDT<> bdt("ZH_Recoil_BDT", "/eos/user/l/lia/FCCee/MidTerm/mumu/BDT/xgb_bdt.root");
           computeModel1 = TMVA::Experimental::Compute<9, float>(bdt);
         ''')
 else:
     ROOT.gInterpreter.ProcessLine('''
-          TMVA::Experimental::RBDT<> bdt("ZH_Recoil_BDT", "/eos/user/l/lia/FCCee/Winter2023/mumu/BDT/xgb_bdt.root");
+          TMVA::Experimental::RBDT<> bdt("ZH_Recoil_BDT", "/eos/user/l/lia/FCCee/MidTerm/ee/BDT/xgb_bdt.root");
           computeModel1 = TMVA::Experimental::Compute<9, float>(bdt);
         ''')
 
@@ -422,36 +422,36 @@ def build_graph(df, dataset):
     
     
    
-    #########
-    ### CUT 7: recoil cut
-    #########
-    ###
-    #Define MVA 
-    ###
-    df = df.Define("MVAVec", ROOT.computeModel1, (
-                                              #leptons
-                                              "leading_zll_lepton_p",
-                                              "leading_zll_lepton_theta",
-                                              "subleading_zll_lepton_p",
-                                              "subleading_zll_lepton_theta",
-                                              "zll_leptons_acolinearity",
-                                              "zll_leptons_acoplanarity",
-                                              #Zed
-                                              "zll_m",
-                                              "zll_p",
-                                              "zll_theta"
-                                              #Higgsstrahlungness
-                                              #"H"
-                                              ))
-    df = df.Define("BDTscore", "MVAVec.at(0)")
-    if args.flavor == "mumu":
-      df = df.Filter("BDTscore > 0.2").Define("cut7", "7")
-    else:
-      df = df.Filter("BDTscore > 0.3").Define("cut7", "7")
-    results.append(df.Histo1D(("cutFlow_cut7", "", *bins_count), "cut7"))
-    if dataset.name in sigProcs: 
-      results.append(df.Histo1D(("higgs_decay_cut7", "", *bins_count), "daughter_higgs_collapsed"))
-      results.append(df.Histo1D(("zll_leps_from_higgs_cut7", "", *bins_count), "zll_leps_from_higgs"))
+    ##########
+    #### CUT 7: recoil cut
+    ##########
+    ####
+    ##Define MVA 
+    ####
+    #df = df.Define("MVAVec", ROOT.computeModel1, (
+    #                                          #leptons
+    #                                          "leading_zll_lepton_p",
+    #                                          "leading_zll_lepton_theta",
+    #                                          "subleading_zll_lepton_p",
+    #                                          "subleading_zll_lepton_theta",
+    #                                          "zll_leptons_acolinearity",
+    #                                          "zll_leptons_acoplanarity",
+    #                                          #Zed
+    #                                          "zll_m",
+    #                                          "zll_p",
+    #                                          "zll_theta"
+    #                                          #Higgsstrahlungness
+    #                                          #"H"
+    #                                          ))
+    #df = df.Define("BDTscore", "MVAVec.at(0)")
+    #if args.flavor == "mumu":
+    #  df = df.Filter("BDTscore > 0.2").Define("cut7", "7")
+    #else:
+    #  df = df.Filter("BDTscore > 0.3").Define("cut7", "7")
+    #results.append(df.Histo1D(("cutFlow_cut7", "", *bins_count), "cut7"))
+    #if dataset.name in sigProcs: 
+    #  results.append(df.Histo1D(("higgs_decay_cut7", "", *bins_count), "daughter_higgs_collapsed"))
+    #  results.append(df.Histo1D(("zll_leps_from_higgs_cut7", "", *bins_count), "zll_leps_from_higgs"))
     ########################
     # Final histograms
     ########################
@@ -548,5 +548,5 @@ if __name__ == "__main__":
         
 
     datasets += functions.filter_datasets(datasets_preproduction_IDEA, select)
-    result = functions.build_and_run(datasets, build_graph, "tmp/output_ZH_%s_%s.root" % (args.type, args.flavor), maxFiles=args.maxFiles, norm=True, lumi=5000000)
+    result = functions.build_and_run(datasets, build_graph, "tmp/output_ZH_%s_%s.root" % (args.type, args.flavor), maxFiles=args.maxFiles, norm=True, lumi=7200000)
     

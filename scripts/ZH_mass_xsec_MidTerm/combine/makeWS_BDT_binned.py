@@ -57,13 +57,13 @@ def doSyst(Syst):
         'xtitle'            : "Recoil mass (GeV)" if not "Score" in hName else "BDT Score",
         'ytitle'            : "Events / 0.2 GeV" if not "Score" in hName else "Events / 0.05",
         
-        'topRight'          : "ZH, #sqrt{s} = 240 GeV, 5 ab^{#minus1}", 
+        'topRight'          : "ZH, #sqrt{s} = 240 GeV, 7.2 ab^{#minus1}", 
         'topLeft'           : "#bf{FCC-ee} #scale[0.7]{#it{Simulation}}",
         
         'ratiofraction'     : 0.25,
-        'ytitleR'           : "Pull",
-        'yminR'             : -3.5,
-        'ymaxR'             : 3.5,
+        'ytitleR'           : "Ratio",
+        'yminR'             : 0.9,
+        'ymaxR'             : 1.1,
     }
     
 
@@ -76,8 +76,10 @@ def doSyst(Syst):
     hist_Down   = hist_Down.Rebin(rebin)
     hist_Up.SetName("signal_%sUp" % (syst_name))
     hist_Down.SetName("signal_%sDown" % (syst_name))
-    hist_Up.Scale(signal_yield/hist_Up.Integral())
-    hist_Down.Scale(signal_yield/hist_Down.Integral())
+    #hist_Up.Scale(signal_yield/hist_Up.Integral())
+    #hist_Down.Scale(signal_yield/hist_Down.Integral())
+    hist_Up.Scale(lumi)
+    hist_Down.Scale(lumi)
     hists.append(hist_Up)
     hists.append(hist_Down)
     fIn_Up.Close()
@@ -87,59 +89,91 @@ def doSyst(Syst):
         # do plotting
         plotter.cfg = cfg
     
-        #cfg['ymax'] = 1.3*hist_zh.GetMaximum()
+        cfg['ymax'] = 1.3*hist_zh.GetMaximum()
     
-        #canvas, padT, padB = plotter.canvasRatio()
-        #dummyT, dummyB = plotter.dummyRatio()
+        canvas, padT, padB = plotter.canvasRatio()
+        dummyT, dummyB = plotter.dummyRatio()
     
-        ### TOP PAD ##
-        #canvas.cd()
-        #padT.Draw()
-        #padT.cd()
-        #dummyT.Draw("HIST")
+        ## TOP PAD ##
+        canvas.cd()
+        padT.Draw()
+        padT.cd()
+        dummyT.Draw("HIST")
     
-        #hist_zh.SetLineColor(ROOT.kBlack)
-        #hist_zh.SetLineWidth(2)
-        #hist_zh.Draw("HIST E SAME")
-    
-        #latex = ROOT.TLatex()
-        #latex.SetNDC()
-        #latex.SetTextSize(0.045)
-        #latex.SetTextColor(1)
-        #latex.SetTextFont(42)
-        #latex.SetTextAlign(13)
-        #latex.DrawLatex(0.2, 0.88, label)
-        #plotter.auxRatio()
-    
-        ### BOTTOM PAD ##
-        #canvas.cd()
-        #padB.Draw()
-        #padB.cd()
-        #dummyB.Draw("HIST")
+        hist_zh.SetLineColor(ROOT.kBlack)
+        hist_zh.SetLineWidth(2)
+        hist_zh.Draw("HIST E SAME")
 
-        #line = ROOT.TLine(120, 0, 140, 0)
-        #line.SetLineColor(ROOT.kBlue+2)
-        #line.SetLineWidth(2)
-        #line.Draw("SAME")
+        hist_Up.SetLineColor(ROOT.kBlue)
+        hist_Up.SetLineWidth(2)
+        hist_Up.Draw("HIST E SAME")
+
+        hist_Down.SetLineColor(ROOT.kRed)
+        hist_Down.SetLineWidth(2)
+        hist_Down.Draw("HIST E SAME")
+
+        # after you've drawn your histograms:
+        legend = ROOT.TLegend(0.6, 0.7, 0.8, 0.9)  # coordinates are in pad fractions, adjust as needed
+        legend.AddEntry(hist_zh, "%s__Nominal" % syst_name, "l")
+        legend.AddEntry(hist_Up, "%s__Up" % syst_name, "l")
+        legend.AddEntry(hist_Down, "%s__Down" % syst_name, "l")
+        legend.SetTextSize(0.04) # Set the text size. Adjust the number as needed
+        legend.SetBorderSize(0)  # No border
+        legend.Draw()
+
+        canvas.Update()
+    
+        latex = ROOT.TLatex()
+        latex.SetNDC()
+        latex.SetTextSize(0.045)
+        latex.SetTextColor(1)
+        latex.SetTextFont(42)
+        latex.SetTextAlign(13)
+        latex.DrawLatex(0.2, 0.88, label)
+        plotter.auxRatio()
+    
+        ## BOTTOM PAD ##
+        # Calculate ratio for hist_Up
+        hist_ratio_Up = hist_Up.Clone()
+        hist_ratio_Up.Divide(hist_zh) 
+
+        # Calculate ratio for hist_Down
+        hist_ratio_Down = hist_Down.Clone()
+        hist_ratio_Down.Divide(hist_zh) 
+ 
+        canvas.cd()
+        padB.Draw()
+        padB.cd()
+        dummyB.Draw("HIST")
+
+        hist_ratio_Up.SetLineColor(ROOT.kBlue)
+        hist_ratio_Up.SetLineWidth(2)
+        hist_ratio_Up.Draw("HIST E SAME")
+
+        hist_ratio_Down.SetLineColor(ROOT.kRed)
+        hist_ratio_Down.SetLineWidth(2)
+        hist_ratio_Down.Draw("HIST E SAME")
+
+        line = ROOT.TLine(0, 1, 1, 1)
+        line.SetLineColor(ROOT.kBlack)
+        line.SetLineWidth(2)
+        line.Draw("SAME")
+    
+        canvas.SaveAs("%s/hist_BDT_%s_%s.png" % (outDir, syst_name, selection))
+        canvas.SaveAs("%s/hist_BDT_%s_%s.pdf" % (outDir, syst_name, selection))
+
     
     
-        #canvas.Modify()
-        #canvas.Update()
-        #canvas.Draw()
-        #canvas.SaveAs("%s/hist_mH%s_%s.png" % (outDir, mH_, selection))
-        #canvas.SaveAs("%s/hist_mH%s_%s.pdf" % (outDir, mH_, selection))
-    
-    
-        #del dummyB
-        #del dummyT
-        #del padT
-        #del padB
-        #del canvas
+        del dummyB
+        del dummyT
+        del padT
+        del padB
+        del canvas
 
 def doSignal():
 
     global h_obs
-    
+    global hist_zh 
     mHs = [125.0]
     if flavor == "mumu":
         procs = ["wzp6_ee_mumuH_ecm240"]
@@ -161,7 +195,7 @@ def doSignal():
         'xtitle'            : "Recoil mass (GeV)" if not "Score" in hName else "BDT Score",
         'ytitle'            : "Events / 0.2 GeV" if not "Score" in hName else "Events / 0.05",
         
-        'topRight'          : "ZH, #sqrt{s} = 240 GeV, 5 ab^{#minus1}", 
+        'topRight'          : "ZH, #sqrt{s} = 240 GeV, 7.2 ab^{#minus1}", 
         'topLeft'           : "#bf{FCC-ee} #scale[0.7]{#it{Simulation}}",
         
         'ratiofraction'     : 0.25,
@@ -189,9 +223,6 @@ def doSignal():
             if h_obs == None: h_obs = hist_zh.Clone("h_obs") # take 125.0 GeV to add to observed (need to add background later as well)
             else: h_obs.Add(hist_zh)
 
-        global signal_yield
-        signal_yield = hist_zh.Integral()
-        print("Signal yield: %.2f" % signal_yield)
         if not doPlot:
             continue
         # do plotting
@@ -318,7 +349,7 @@ def doBackgrounds():
         'xtitle'            : "Recoil mass (GeV)" if not "Score" in hName else "BDT Score",
         'ytitle'            : "Events / 0.1 GeV" if not "Score" in hName else "Events / 0.05",
         
-        'topRight'          : "BKGS, #sqrt{s} = 240 GeV, 5 ab^{#minus1}", 
+        'topRight'          : "BKGS, #sqrt{s} = 240 GeV, 7.2 ab^{#minus1}", 
         'topLeft'           : "#bf{FCC-ee} #scale[0.7]{#it{Simulation}}",
         
         'ratiofraction'     : 0.25,
@@ -379,8 +410,7 @@ if __name__ == "__main__":
 
     #flavor = "ee"
     flavor = "mumu"
-    #selection = "sel_Baseline_no_costhetamiss_histo" 
-    #baseFileName = "/eos/user/l/lia/FCCee/NewWorkFlow/BDT_analysis_samples/final/{sampleName}_sel0_MRecoil_Mll_73_120_pll_05_histo.root"
+    
     if flavor == "mumu":
         label = "#mu^{#plus}#mu^{#minus}"
     elif flavor == "ee":
@@ -392,13 +422,12 @@ if __name__ == "__main__":
     outDir = "/eos/user/l/lia/FCCee/MidTerm/{flavor}/ZH_mass_xsec/combine_binned_BDTScore/".format(flavor=flavor)
     if not os.path.exists(outDir): os.makedirs(outDir)
     if not os.path.exists(runDir): os.makedirs(runDir)
-    lumi = 5000000
-    rebin = 1 
+    lumi = 7200000.
+    rebin = 1
     h_obs = None # should hold the data_obs = sum of signal and backgrounds
 
     hists = []
-    signal_yield = 0
-    
+    hist_zh = None 
     # define temporary output workspace
     w_tmp = ROOT.RooWorkspace("w_tmp", "workspace")
     w = ROOT.RooWorkspace("w", "workspace") # final workspace for combine

@@ -83,7 +83,7 @@ def analyzeMass(runDir, outDir, xMin=-1, xMax=-1, yMin=0, yMax=2, label="label")
         'xtitle'            : "m_{h} (GeV)",
         'ytitle'            : "-2#DeltaNLL",
             
-        'topRight'          : "#sqrt{s} = 240 GeV, 5 ab^{#minus1}", 
+        'topRight'          : "#sqrt{s} = 240 GeV,  7.2 ab^{#minus1}", 
         'topLeft'           : "#bf{FCC-ee} #scale[0.7]{#it{Internal}}",
         }
         
@@ -144,7 +144,7 @@ def analyzeXsec(runDir, outDir, xMin=-1, xMax=-1, yMin=0, yMax=2, label="label")
     
     ref_xsec = 0.201868 # pb, for pythia
     ref_xsec = 0.0067656 # whizard, Z->mumu
-    ref_xsec = 1
+    ref_xsec = 1.0000000000
 
     xv, yv = [], []
     for i in range(0, t.GetEntries()):
@@ -182,7 +182,7 @@ def analyzeXsec(runDir, outDir, xMin=-1, xMax=-1, yMin=0, yMax=2, label="label")
         'xtitle'            : "#sigma(ZH, Z#rightarrow#mu#mu)/#sigma_{ref}",
         'ytitle'            : "-2#DeltaNLL",
             
-        'topRight'          : "#sqrt{s} = 240 GeV, 5 ab^{#minus1}", 
+        'topRight'          : "#sqrt{s} = 240 GeV,  7.2 ab^{#minus1}", 
         'topLeft'           : "#bf{FCCee} #scale[0.7]{#it{Internal}}",
     }
         
@@ -213,7 +213,7 @@ def analyzeXsec(runDir, outDir, xMin=-1, xMax=-1, yMin=0, yMax=2, label="label")
     leg.SetTextSize(0.035)
     leg.SetMargin(0.15)
     leg.SetBorderSize(1)
-    leg.AddEntry(g, "%s, #delta(#sigma) = %.2f %%" % (label, unc*100.), "LP")
+    leg.AddEntry(g, "%s, #delta(#sigma) = %.4f %%" % (label, unc*100.), "LP")
     leg.Draw()
               
     plotter.aux()
@@ -224,17 +224,15 @@ def analyzeXsec(runDir, outDir, xMin=-1, xMax=-1, yMin=0, yMax=2, label="label")
     canvas.SaveAs("%s/xsec%s.pdf" % (outDir, suffix))
     
     # write values to text file
-    str_out = "%f %f %f %f\n" % (unc_m, unc_p, unc, xsec)
-    for i in range(0, len(xv)): str_out += "%f %f\n" % (xv[i], yv[i])
+    str_out = "%.16f %.16f %.16f %.16f\n" % (unc_m, unc_p, unc, xsec)
+    for i in range(0, len(xv)): str_out += "%.16f %.16f\n" % (xv[i], yv[i])
     tFile = open("%s/xsec%s.txt" % (outDir, suffix), "w")
     tFile.write(str_out)
     tFile.close()
     tFile = open("%s/xsec%s.txt" % (runDir, suffix), "w")
     print "writing to %s/xsec%s.txt" % (runDir, suffix)
-    tFile.write(str_out)
     tFile.close()
 
-    
 
 def doFit_xsec(runDir, rMin=0.98, rMax=1.02, npoints=50, combineOptions = ""):
     os.makedirs(runDir) if not os.path.exists(runDir) else None
@@ -257,7 +255,16 @@ def doFitDiagnostics_mass(runDir, mhMin=124.99, mhMax=125.01, combineOptions = "
     
     # ,shapeBkg_bkg_bin1__norm
     subprocess.call(cmd, shell=True, cwd=runDir)
+
+def doFitDiagnostics_xsec(runDir, rMin=0.98, rMax=1.02, combineOptions = ""):
+
+    # scan for signal mass
+    cmd = "combine -M FitDiagnostics -t -1 --setParameterRanges r=%f,%f ws.root --expectSignal=1 -m 125 --redefineSignalPOIs r --X-rtd TMCSO_AdaptivePseudoAsimov -v 10 --X-rtd ADDNLL_CBNLL=0 -n xsec %s" % (rMin, rMax, combineOptions)
     
+    # ,shapeBkg_bkg_bin1__norm
+    subprocess.call(cmd, shell=True, cwd=runDir)
+    
+
 def plotMultiple(tags, labels, fOut, xMin=-1, xMax=-1, yMin=0, yMax=2):
 
     best_mass, best_xsec = [], []
@@ -298,7 +305,7 @@ def plotMultiple(tags, labels, fOut, xMin=-1, xMax=-1, yMin=0, yMax=2):
         'xtitle'            : "m_{h} (GeV)",
         'ytitle'            : "-2#DeltaNLL",
             
-        'topRight'          : "#sqrt{s} = 240 GeV, 5 ab^{#minus1}", 
+        'topRight'          : "#sqrt{s} = 240 GeV,  7.2 ab^{#minus1}", 
         'topLeft'           : "#bf{FCC-ee} #scale[0.7]{#it{Simulation}}",
         }
         
@@ -388,7 +395,7 @@ def plotMultiple_xsec(tags, labels, dirIn, fOut, xMin=-1, xMax=-1, yMin=0, yMax=
         'xtitle'            : xTitle,
         'ytitle'            : "-2#DeltaNLL",
             
-        'topRight'          : "#sqrt{s} = 240 GeV, 5 ab^{#minus1}", 
+        'topRight'          : "#sqrt{s} = 240 GeV,  7.2 ab^{#minus1}", 
         'topLeft'           : "#bf{FCC-ee} #scale[0.7]{#it{Simulation}}",
         }
         
@@ -418,7 +425,7 @@ def plotMultiple_xsec(tags, labels, dirIn, fOut, xMin=-1, xMax=-1, yMin=0, yMax=
         g.SetLineColor(colors[i])
         g.SetLineWidth(4)
         g.Draw("SAME L")
-        leg.AddEntry(g, "%s #delta(#sigma) = %.3f %%" % (labels[i], unc_xsec[i]*100.), "L")
+        leg.AddEntry(g, "%s #delta(#sigma) = %.4f %%" % (labels[i], unc_xsec[i]*100.), "L")
     
     leg.Draw()
     line = ROOT.TLine(float(cfg['xmin']), 1, float(cfg['xmax']), 1)
@@ -465,9 +472,9 @@ def breakDown():
     canvas.SetTickx(1)
 
     if flavor == "combine":
-        xMin, xMax = -0.1, 0.1
+        xMin, xMax = -0.12, 0.12
     else:
-        xMin, xMax = -1.5, 1.5
+        xMin, xMax = -0.12, 0.12
     if flavor == "mumu":
         xTitle = "#sigma_{syst.}(#sigma(ZH, Z#rightarrow#mu#mu)/#sigma_{ref}) (%)"
     elif flavor == "ee": 
@@ -477,6 +484,8 @@ def breakDown():
 
     ref = "STAT"
     best_ref, unc_ref = getUnc(ref, "xsec")
+    print("reference")
+    print(best_ref, unc_ref)
     if flavor == "mumu":
         params = ["BES", "SQRTS", "MUSCALE", "BES_SQRTS_MUSCALE"]
         labels = ["BES 1%", "#sqrt{s} #pm 2 MeV", "Muon scale (~10^{-5})", "#splitline{Syst. combined}{(BES 1%)}"]
@@ -496,13 +505,14 @@ def breakDown():
 
         i -= 1
         best, unc = getUnc(params[p], "xsec")
-        print (params[p], best, unc)
+        print(params[p])
+        print(best, unc)
         unc = math.sqrt(abs(unc**2 - unc_ref**2))
+        print(unc)
         g_pulls.SetPoint(i, 0, float(i) + 0.5)
         g_pulls.SetPointError(i, unc, unc, 0., 0.)
-        h_pulls.GetYaxis().SetBinLabel(i + 1, labels[p])
-       
-
+        #h_pulls.GetYaxis().SetBinLabel(i + 1, labels[p])
+        h_pulls.GetYaxis().SetBinLabel(i + 1, "#splitline{%s}{(%.6f %%)}" % (labels[p], unc)) 
 
     h_pulls.GetXaxis().SetTitleSize(0.04)
     h_pulls.GetXaxis().SetLabelSize(0.03)
@@ -527,7 +537,7 @@ def breakDown():
     latex.SetTextColor(1)
     latex.SetTextFont(42)
     latex.SetTextAlign(30) # 0 special vertical aligment with subscripts
-    latex.DrawLatex(0.95, 0.925, "#sqrt{s} = 240 GeV, 5 ab^{#minus1}")
+    latex.DrawLatex(0.95, 0.925, "#sqrt{s} = 240 GeV,  7.2 ab^{#minus1}")
 
     latex.SetTextAlign(13)
     latex.SetTextFont(42)
@@ -598,7 +608,7 @@ def breakDown():
     #latex.SetTextColor(1)
     #latex.SetTextFont(42)
     #latex.SetTextAlign(30) # 0 special vertical aligment with subscripts
-    #latex.DrawLatex(0.95, 0.925, "#sqrt{s} = 240 GeV, 5 ab^{#minus1}")
+    #latex.DrawLatex(0.95, 0.925, "#sqrt{s} = 240 GeV,  10 ab^{#minus1}")
 
     #latex.SetTextAlign(13)
     #latex.SetTextFont(42)
@@ -645,15 +655,17 @@ if __name__ == "__main__":
         tag = "BDTScore" # BDT baseline baseline_no_costhetamiss BDTScore
         #rMin, rMax = 0.96, 1.04
         rMin, rMax = 0.98, 1.02
-
+        npoints = 50
         #flavor = "ee"
-        #flavor = "mumu"
-        flavor = "combine"
-        combineOptions = "--setParameters bkg_mumu_norm=0.1,bkg_ee_norm=0.001"
+        flavor = "mumu"
+        #flavor = "combine"
+        #combineOptions = "--setParameters bkg_mumu_norm=0.1,bkg_ee_norm=0.001"
         combineOptions = ""
         
         combineDir = "combine/run_binned_BDTScore_{flavor}/".format(flavor=flavor)
         outDir = "/eos/user/l/lia/FCCee/MidTerm/{flavor}/ZH_mass_xsec/combine_binned_BDTScore/".format(flavor=flavor)
+        if not os.path.exists(outDir):
+            os.makedirs(outDir)
         if flavor == "mumu":
             label = "#mu^{#plus}#mu^{#minus}"
         elif flavor == "ee":
@@ -675,7 +687,7 @@ if __name__ == "__main__":
         elif flavor == "combine":
             combineOptions = "--freezeParameters=MUSCALE,ELSCALE,BES,SQRTS"
         
-        doFit_xsec("%s" % (combineDir), rMin=rMin, rMax=rMax, npoints=50, combineOptions=combineOptions)
+        doFit_xsec("%s" % (combineDir), rMin=rMin, rMax=rMax, npoints=npoints, combineOptions=combineOptions)
         analyzeXsec("%s" % (combineDir), "%s" % (outDir), label=label, xMin=rMin, xMax=rMax)
 
     
@@ -686,16 +698,16 @@ if __name__ == "__main__":
         elif flavor == "combine":
             suffix = "_MUSCALE"
             combineOptions = "--freezeParameters=BES,SQRTS,ELSCALE"
-            doFit_xsec("%s" % (combineDir), rMin=rMin, rMax=rMax, npoints=50, combineOptions=combineOptions)
+            doFit_xsec("%s" % (combineDir), rMin=rMin, rMax=rMax, npoints=npoints, combineOptions=combineOptions)
             analyzeXsec("%s" % (combineDir), "%s" % (outDir), label=label, xMin=rMin, xMax=rMax)
             suffix = "_ELSCALE"
             combineOptions = "--freezeParameters=BES,SQRTS,MUSCALE"
-            doFit_xsec("%s" % (combineDir), rMin=rMin, rMax=rMax, npoints=50, combineOptions=combineOptions)
+            doFit_xsec("%s" % (combineDir), rMin=rMin, rMax=rMax, npoints=npoints, combineOptions=combineOptions)
             analyzeXsec("%s" % (combineDir), "%s" % (outDir), label=label, xMin=rMin, xMax=rMax)
 
         if not flavor == "combine":
             combineOptions = "--freezeParameters=BES,SQRTS"
-            doFit_xsec("%s" % (combineDir), rMin=rMin, rMax=rMax, npoints=50, combineOptions=combineOptions)
+            doFit_xsec("%s" % (combineDir), rMin=rMin, rMax=rMax, npoints=npoints, combineOptions=combineOptions)
             analyzeXsec("%s" % (combineDir), "%s" % (outDir), label=label, xMin=rMin, xMax=rMax)
 
         suffix = "_BES"
@@ -705,7 +717,7 @@ if __name__ == "__main__":
             combineOptions = "--freezeParameters=ELSCALE,SQRTS"
         elif flavor == "combine":
             combineOptions = "--freezeParameters=MUSCALE,ELSCALE,SQRTS"
-        doFit_xsec("%s" % (combineDir), rMin=rMin, rMax=rMax, npoints=50, combineOptions=combineOptions)
+        doFit_xsec("%s" % (combineDir), rMin=rMin, rMax=rMax, npoints=npoints, combineOptions=combineOptions)
         analyzeXsec("%s" % (combineDir), "%s" % (outDir), label=label, xMin=rMin, xMax=rMax)
 
         suffix = "_SQRTS"
@@ -715,8 +727,10 @@ if __name__ == "__main__":
             combineOptions = "--freezeParameters=ELSCALE,BES"
         elif flavor == "combine":
             combineOptions = "--freezeParameters=MUSCALE,ELSCALE,BES"
-        doFit_xsec("%s" % (combineDir), rMin=rMin, rMax=rMax, npoints=50, combineOptions=combineOptions)
+        #doFitDiagnostics_xsec("%s" % (combineDir), rMin=rMin, rMax=rMax, combineOptions=combineOptions)
+        doFit_xsec("%s" % (combineDir), rMin=rMin, rMax=rMax, npoints=npoints, combineOptions=combineOptions)
         analyzeXsec("%s" % (combineDir), "%s" % (outDir), label=label, xMin=rMin, xMax=rMax)
+        
         if flavor == "mumu":
             suffix = "_BES_SQRTS_MUSCALE"
         elif flavor == "ee":
@@ -724,9 +738,9 @@ if __name__ == "__main__":
         elif flavor == "combine":
             suffix = "_BES_SQRTS_MUSCALE_ELSCALE"
         combineOptions = ""
-        doFit_xsec("%s" % (combineDir), rMin=rMin, rMax=rMax, npoints=50, combineOptions=combineOptions)
+        doFit_xsec("%s" % (combineDir), rMin=rMin, rMax=rMax, npoints=npoints, combineOptions=combineOptions)
         analyzeXsec("%s" % (combineDir), "%s" % (outDir), label=label, xMin=rMin, xMax=rMax)
-
+        #doFitDiagnostics_xsec("%s" % (combineDir), rMin=rMin, rMax=rMax, combineOptions=combineOptions)
         # systematics breakdown plot 
         runDir = outDir 
         breakDown()
@@ -752,7 +766,7 @@ if __name__ == "__main__":
                                "/eos/user/l/lia/FCCee/MidTerm/combine/ZH_mass_xsec/combine_binned_BDTScore/"],
                               outDir,
                               name="_SYST") 
-        # systematics breakdown plot
+        #systematics breakdown plot
         
 
 

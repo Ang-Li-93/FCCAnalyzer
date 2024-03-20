@@ -175,7 +175,7 @@ if __name__ == '__main__':
     flavor = "mumu"  # Define flavor here
     selection = "sel_Baseline_no_costhetamiss"
     hName = "BDT_Score"
-    lumi = 5e+06
+    lumi = 10e+06
     rebin = 1
     baseFileName = "/eos/user/l/lia/FCCee/MidTerm/{flavor}/BDT_analysis_samples/final/{sampleName}_{selection}_histo.root"
     run()

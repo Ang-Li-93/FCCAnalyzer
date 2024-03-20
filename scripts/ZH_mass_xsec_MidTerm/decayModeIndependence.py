@@ -72,7 +72,7 @@ def makePlot(g_pulls, h_pulls, avg=0):
     latex.SetTextColor(1)
     latex.SetTextFont(42)
     latex.SetTextAlign(30) # 0 special vertical aligment with subscripts
-    latex.DrawLatex(0.95, 0.925, "#sqrt{s} = 240 GeV, 5 ab^{#minus1}")
+    latex.DrawLatex(0.95, 0.925, "#sqrt{s} = 240 GeV, 7.2 ab^{#minus1}")
 
     latex.SetTextAlign(13)
     latex.SetTextFont(42)

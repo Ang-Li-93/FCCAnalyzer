@@ -3,7 +3,7 @@ jmax *
 kmax *
 ---------------
 #shapes sig        * datacard.root signal
-#shapes bkg_mumu * datacard.root background
+#shapes bkg * datacard.root background
 #shapes data_obs      * datacard.root data_obs
 #shapes sig        * datacard.root signal_$SYSTEMATIC 
 
