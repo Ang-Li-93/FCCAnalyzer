@@ -472,9 +472,9 @@ def breakDown():
     canvas.SetTickx(1)
 
     if flavor == "combine":
-        xMin, xMax = -0.12, 0.12
+        xMin, xMax = -0.5, 0.5
     else:
-        xMin, xMax = -0.12, 0.12
+        xMin, xMax = -0.5, 0.5
     if flavor == "mumu":
         xTitle = "#sigma_{syst.}(#sigma(ZH, Z#rightarrow#mu#mu)/#sigma_{ref}) (%)"
     elif flavor == "ee": 
@@ -488,13 +488,13 @@ def breakDown():
     print(best_ref, unc_ref)
     if flavor == "mumu":
         params = ["BES", "SQRTS", "MUSCALE", "BES_SQRTS_MUSCALE"]
-        labels = ["BES 1%", "#sqrt{s} #pm 2 MeV", "Muon scale (~10^{-5})", "#splitline{Syst. combined}{(BES 1%)}"]
+        labels = ["BES 10%", "#sqrt{s} #pm 2 MeV", "Muon scale (~10^{-5})", "#splitline{Syst. combined}{(BES 1%)}"]
     elif flavor == "ee":
         params = ["BES", "SQRTS", "ELSCALE", "BES_SQRTS_ELSCALE"]
-        labels = ["BES 1%", "#sqrt{s} #pm 2 MeV", "Electron scale (~10^{-5})", "#splitline{Syst. combined}{(BES 1%)}"]
+        labels = ["BES 10%", "#sqrt{s} #pm 2 MeV", "Electron scale (~10^{-5})", "#splitline{Syst. combined}{(BES 1%)}"]
     elif flavor == "combine":
         params = ["BES", "SQRTS", "MUSCALE", "ELSCALE", "BES_SQRTS_MUSCALE_ELSCALE"]
-        labels = ["BES 1%", "#sqrt{s} #pm 2 MeV", "Muon scale (~10^{-5})", "El. scale (~10^{-5})", "#splitline{Syst. combined}{(BES 1%)}"]
+        labels = ["BES 10%", "#sqrt{s} #pm 2 MeV", "Muon scale (~10^{-5})", "El. scale (~10^{-5})", "#splitline{Syst. combined}{(BES 1%)}"]
 
     n_params = len(params)
     h_pulls = ROOT.TH2F("pulls", "pulls", 6, xMin, xMax, n_params, 0, n_params)

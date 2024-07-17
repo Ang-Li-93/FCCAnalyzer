@@ -17,8 +17,8 @@ def doSyst(Syst):
     selection_Up = "sel_Baseline_no_costhetamiss"
     selection_Down = "sel_Baseline_no_costhetamiss"
     if Syst == "BES":
-        proc_Up = "wzp6_ee_{flavor}H_BES-higher-1pc_ecm365".format(flavor=flavor)
-        proc_Down = "wzp6_ee_{flavor}H_BES-lower-1pc_ecm365".format(flavor=flavor)
+        proc_Up = "wzp6_ee_{flavor}H_BES-higher-10pc_ecm365".format(flavor=flavor)
+        proc_Down = "wzp6_ee_{flavor}H_BES-lower-10pc_ecm365".format(flavor=flavor)
         hName_Up = "BDT_Score"
         hName_Down = "BDT_Score"
         syst_name = "BES"
@@ -408,8 +408,8 @@ def doBackgrounds():
  
 if __name__ == "__main__":
 
-    flavor = "ee"
-    #flavor = "mumu"
+    #flavor = "ee"
+    flavor = "mumu"
     
     if flavor == "mumu":
         label = "#mu^{#plus}#mu^{#minus}"
