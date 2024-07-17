@@ -422,7 +422,7 @@ if __name__ == "__main__":
     outDir = "/eos/user/l/lia/FCCee/MidTerm/{flavor}/ZH_mass_xsec/combine_binned_BDTScore/".format(flavor=flavor)
     if not os.path.exists(outDir): os.makedirs(outDir)
     if not os.path.exists(runDir): os.makedirs(runDir)
-    lumi = 7200000.
+    lumi = 10800000.
     rebin = 1
     h_obs = None # should hold the data_obs = sum of signal and backgrounds
 
